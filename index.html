@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Game</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .game-container {
+            text-align: center;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 120px);
+            gap: 5px;
+            margin: 20px auto;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: #fff;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .cell {
+            width: 120px;
+            height: 120px;
+            background-color: #f9f9f9;
+            border: 2px solid #ccc;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 3rem;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .cell:hover {
+            background-color: #e0e0e0;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 1rem;
+            cursor: pointer;
+            background-color: #008cba;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #005f5f;
+        }
+
+        .winning-message {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .winning-message.show {
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="board" id="board">
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+        </div>
+        <button id="restartButton">Restart Game</button>
+        <div id="winningMessage" class="winning-message">
+            <div id="winningMessageText"></div>
+            <button id="restartButtonWin">Restart Game</button>
+        </div>
+    </div>
+    <script>
+        const board = document.getElementById('board');
+        const cells = document.querySelectorAll('[data-cell]');
+        const restartButton = document.getElementById('restartButton');
+        const winningMessage = document.getElementById('winningMessage');
+        const winningMessageText = document.getElementById('winningMessageText');
+        const restartButtonWin = document.getElementById('restartButtonWin');
+        let currentPlayer = 'X';
+
+        const WINNING_COMBINATIONS = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6]
+        ];
+
+        function startGame() {
+            cells.forEach(cell => {
+                cell.classList.remove('X');
+                cell.classList.remove('O');
+                cell.innerText = '';
+                cell.addEventListener('click', handleClick, { once: true });
+            });
+            currentPlayer = 'X';
+            setBoardHoverClass();
+            winningMessage.classList.remove('show');
+        }
+
+        function handleClick(e) {
+            const cell = e.target;
+            cell.innerText = currentPlayer;
+            cell.classList.add(currentPlayer);
+            
+            if (checkWin(currentPlayer)) {
+                endGame(false);
+            } else if (isDraw()) {
+                endGame(true);
+            } else {
+                swapTurns();
+                setBoardHoverClass();
+            }
+        }
+
+        function endGame(draw) {
+            if (draw) {
+                winningMessageText.innerText = "Draw!";
+            } else {
+                winningMessageText.innerText = `${currentPlayer} Wins!`;
+            }
+            winningMessage.classList.add('show');
+        }
+
+        function isDraw() {
+            return [...cells].every(cell => {
+                return cell.classList.contains('X') || cell.classList.contains('O');
+            });
+        }
+
+        function swapTurns() {
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        }
+
+        function setBoardHoverClass() {
+            board.classList.remove('X');
+            board.classList.remove('O');
+            board.classList.add(currentPlayer);
+        }
+
+        function checkWin(player) {
+            return WINNING_COMBINATIONS.some(combination => {
+                return combination.every(index => {
+                    return cells[index].classList.contains(player);
+                });
+            });
+        }
+
+        restartButton.addEventListener('click', startGame);
+        restartButtonWin.addEventListener('click', startGame);
+
+        startGame();
+
+    </script>
+</body>
+</html>
